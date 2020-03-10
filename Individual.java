@@ -2,18 +2,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Individual {
-    ArrayList<Integer> genotype;
-    int genLength;
+    private ArrayList<Integer> genotype;
+    private int genLength;
 
     public Individual(int genLength) {
         this.genotype = new ArrayList<>();
         this.genLength = genLength;
     }
 
-    public void randomGenotype()
-    {
-        for (int i = 0; i < genLength; i++ )
-        {
+    public void randomGenotype() {
+        for (int i = 0; i < genLength; i++ ) {
             genotype.add(i);
         }
         Collections.shuffle(genotype);
