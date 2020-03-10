@@ -1,9 +1,7 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 public class GeneticAlgorithm {
     private TSP problem;
@@ -13,7 +11,7 @@ public class GeneticAlgorithm {
     }
 
     public ArrayList<Integer> solve(int numberOfGenerations, int popSize, int genLength, double mutationProb,
-                                    double crossoverProb) {
+                                    double crossoverProb, double pressure) {
         ArrayList<Pair> generation_x = initialisePopulation(popSize, genLength);
         ArrayList<Pair> generation_y = new ArrayList<>();
         evaluate(generation_x);
@@ -22,24 +20,22 @@ public class GeneticAlgorithm {
 
         for (int i = 0; i < numberOfGenerations; i++) {
             while (generation_y.size() < popSize) {
-                Individual parent1 = selection(generation_x);
-                Individual parent2 = selection(generation_x);
-                Individual child;
+                Pair parent1 = tourney(generation_x, pressure);
+                Pair parent2 = tourney(generation_x, pressure);
+                Pair child = new Pair(0);
 
                 if (generator.nextDouble() < crossoverProb) {
-                    child = crossover(parent1, parent2);
+                    child.individual = crossover(parent1.individual, parent2.individual);
                 } else {
-                    child = parent1;
+                    child.individual = parent1.individual;
                 }
 
-                mutation(child, mutationProb);
+                mutation(child.individual, mutationProb);
+                evaluate(child);
+                generation_y.add(child);
 
-                Pair child_wrapper = new Pair(child);
-                evaluate(child_wrapper);
-                generation_y.add(child_wrapper);
-
-                if (theBestSolution.distance > child_wrapper.distance) {
-                    theBestSolution = child_wrapper;
+                if (theBestSolution.distance > child.distance) {
+                    theBestSolution = child;
                 }
 
                 generation_x = new ArrayList<>(generation_y);
@@ -50,7 +46,7 @@ public class GeneticAlgorithm {
     }
 
 
-    private ArrayList<Pair> initialisePopulation(int popSize, int genLength) {
+    public ArrayList<Pair> initialisePopulation(int popSize, int genLength) {
         ArrayList<Pair> population = new ArrayList<>();
 
         for (int i = 0; i < popSize; i++) {
@@ -62,13 +58,13 @@ public class GeneticAlgorithm {
         return population;
     }
 
-    private void evaluate(ArrayList<Pair> individuals) {
+    public void evaluate(ArrayList<Pair> individuals) {
         for (int i = 0; i < individuals.size(); i++) {
             evaluate(individuals.get(i));
         }
     }
 
-    private void evaluate(Pair individual) {
+    public void evaluate(Pair individual) {
         individual.setDistance(problem.distance(individual.getIndividual().getGenotype()));
     }
 
@@ -121,12 +117,22 @@ public class GeneticAlgorithm {
         return child;
     }
 
-    private Individual selection(ArrayList<Pair> generation) {
-        return null;
+    public Pair tourney(ArrayList<Pair> generation, double pressure) {
+        Random generator = new Random();
+        Pair winner = new Pair(Double.MAX_VALUE);
+        Pair temp = null;
+        int tourneySize = (int)(pressure * generation.size());
+        for(int i = 0; i < tourneySize; i++) {
+            temp = generation.get(generator.nextInt(generation.size()));
+            if(winner.distance > temp.distance) {
+                winner = temp;
+            }
+        }
+        return temp;
     }
 
 
-    private class Pair {
+    class Pair {
         private Individual individual;
         private double distance;
 
