@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 
-
 public class Main {
     public static void main(String[] args)
     {
@@ -14,7 +13,6 @@ public class Main {
             ar.add(i);
         }
         System.out.println(tsp.distance(ar));
-/*
 
         int populationSize = 100000;
         ArrayList<Integer> theBestGenotypeRandom = RandomSolution.solve(populationSize, tsp);
@@ -22,11 +20,11 @@ public class Main {
         System.out.println(theBestGenotypeRandom);
         System.out.println(tsp.distance(theBestGenotypeRandom));
 
-*//*        int idxStartCity = 0;
+        int idxStartCity = 0;
         ArrayList<Integer> greedySolution = Greedy.solve(idxStartCity, tsp);
         System.out.println("---------------Greedy----------------");
         System.out.println(greedySolution);
-        System.out.println(tsp.distance(greedySolution));*/
+        System.out.println(tsp.distance(greedySolution));
 
 
         long y = System.currentTimeMillis();

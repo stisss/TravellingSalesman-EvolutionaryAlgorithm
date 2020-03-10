@@ -1,11 +1,7 @@
-import javafx.util.Pair;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class Loader {
@@ -15,7 +11,7 @@ public class Loader {
         ArrayList<Double[]> ar = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-            String st = " ";
+            String st;
             Pattern pattern = Pattern.compile("\\d+.*");
             while(!((st = br.readLine().trim()).equals("EOF")))
             {
