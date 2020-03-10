@@ -1,5 +1,6 @@
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class Main {
@@ -8,7 +9,6 @@ public class Main {
 
         String filename = "berlin11_modified.tsp";
         TSP tsp = new TSP(filename);
-
 
 /*        int populationSize = 100000;
         ArrayList<Integer> theBestGenotypeRandom = RandomSolution.solve(populationSize, tsp);
@@ -21,7 +21,6 @@ public class Main {
         System.out.println("---------------Greedy----------------");
         System.out.println(greedySolution);
         System.out.println(tsp.distance(greedySolution));*/
-
 
         long y = System.currentTimeMillis();
         System.out.println("Time: " + (y-x)/1000.0 + "s");
