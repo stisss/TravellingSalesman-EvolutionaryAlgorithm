@@ -1,3 +1,5 @@
+import com.sun.org.apache.bcel.internal.generic.ALOAD;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,14 +22,14 @@ public class GeneticAlgorithm {
 
         for (int i = 0; i < numberOfGenerations; i++) {
             while (generation_y.size() < popSize) {
-                Pair parent1 = tourney(generation_x, pressure);
-                Pair parent2 = tourney(generation_x, pressure);
+                Pair parent1 = roulette(generation_x, pressure);
+                Pair parent2 = roulette(generation_x, pressure);
                 Pair child = new Pair(0);
 
                 if (generator.nextDouble() < crossoverProb) {
                     child.individual = crossover(parent1.individual, parent2.individual);
                 } else {
-                    child.individual = parent1.individual;
+                    child = new Pair(parent1);
                 }
 
                 mutation(child.individual, mutationProb);
@@ -37,10 +39,9 @@ public class GeneticAlgorithm {
                 if (theBestSolution.distance > child.distance) {
                     theBestSolution = child;
                 }
-
-                generation_x = new ArrayList<>(generation_y);
-                generation_y.clear();
             }
+            generation_x = new ArrayList<>(generation_y);
+            generation_y.clear();
         }
         return theBestSolution.individual.getGenotype();
     }
@@ -76,7 +77,9 @@ public class GeneticAlgorithm {
 
         for (int i = 0; i < length; i++) {
             if (mutationProb > generator.nextDouble()) {
-                do{ swapIdx = generator.nextInt(length); } while (i == swapIdx);
+                do {
+                    swapIdx = generator.nextInt(length);
+                } while (i == swapIdx);
                 Collections.swap(newGenotype, i, swapIdx);
             }
         }
@@ -120,15 +123,57 @@ public class GeneticAlgorithm {
     public Pair tourney(ArrayList<Pair> generation, double pressure) {
         Random generator = new Random();
         Pair winner = new Pair(Double.MAX_VALUE);
-        Pair temp = null;
-        int tourneySize = (int)(pressure * generation.size());
-        for(int i = 0; i < tourneySize; i++) {
+        Pair temp;
+        int tourneySize = (int) (pressure * generation.size());
+        for (int i = 0; i < tourneySize; i++) {
             temp = generation.get(generator.nextInt(generation.size()));
-            if(winner.distance > temp.distance) {
+            if (winner.distance > temp.distance) {
                 winner = temp;
             }
         }
-        return temp;
+        return winner;
+    }
+
+    public Pair roulette(ArrayList<Pair> generation, double pressure) {
+        Random generator = new Random();
+        ArrayList<Double> weights = new ArrayList<>();
+        ArrayList<Integer> indices = new ArrayList<>();
+        int rouletteSize = (int) (pressure * generation.size());
+        Pair winner = new Pair(Double.MIN_VALUE);
+        double maxDist = Double.MIN_VALUE;
+
+        for (int i = 0; i < rouletteSize; i++) {
+            int idx = generator.nextInt(generation.size());
+            indices.add(idx);
+
+            if (maxDist < generation.get(idx).distance) {
+                maxDist = generation.get(idx).distance;
+            }
+        }
+
+        double weightsSum = 0;
+        double currentWeight;
+
+        for (int i = 0; i < rouletteSize; i++) {
+            currentWeight = ((maxDist - generation.get(indices.get(i)).distance + Double.MIN_VALUE)) + weightsSum;
+            weights.add(currentWeight);
+            weightsSum += currentWeight;
+        }
+
+        double roulette = generator.nextDouble();
+        double breakpoint = roulette * weightsSum;
+
+        for(int i = 0; i < rouletteSize; i++) {
+            if(breakpoint < weights.get(i)) {
+                winner = generation.get(indices.get(i));
+            }
+        }
+
+        if (winner.individual == null) {
+            winner = generation.get(indices.get(indices.size()-1));
+        }
+
+        return new Pair(winner);
     }
 
 

@@ -1,7 +1,4 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 public class Main {
     public static void main(String[] args) {
@@ -9,6 +6,18 @@ public class Main {
 
         String filename = "berlin11_modified.tsp";
         TSP tsp = new TSP(filename);
+
+        int iterations = 10000;
+        int popSize = 100;
+        int numberOfCities = tsp.getNumberOfCities();
+        double mutationProb = 0.01;
+        double crossoverProb = 0.9;
+        double pressure = 0.3;
+
+        GeneticAlgorithm ga = new GeneticAlgorithm(tsp);
+        ArrayList<Integer> gaSolution = ga.solve(iterations, popSize, numberOfCities, mutationProb, crossoverProb, pressure);
+        System.out.println(gaSolution);
+        System.out.println(tsp.distance(gaSolution));
 
 /*        int populationSize = 100000;
         ArrayList<Integer> theBestGenotypeRandom = RandomSolution.solve(populationSize, tsp);
